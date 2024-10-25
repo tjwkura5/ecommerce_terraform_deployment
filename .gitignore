@@ -163,3 +163,5 @@ cython_debug/
 
 #Terraform
 Terraform/variables.auto.tfvars
+Terraform/.terraform
+Terraform/.terraform/*
