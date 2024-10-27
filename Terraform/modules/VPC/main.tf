@@ -214,6 +214,14 @@ resource "aws_security_group" "backend_security_group" {
     cidr_blocks = ["0.0.0.0/0"]  
   }
 
+  ingress {
+    description = "Allow inbound traffic on Node Exporters default port 9100"
+    from_port   = 9100
+    to_port     = 9100
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+  }
+
   # Egress (outbound) rule to allow all traffic
   egress {
     from_port   = 0

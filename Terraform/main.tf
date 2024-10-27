@@ -22,6 +22,15 @@ module "VPC" {
   source = "./modules/VPC"
 }
 
+module "RDS" {
+  source = "./modules/RDS"
+  vpc_id = module.VPC.vpc_id
+  private_subnet_id = module.VPC.private_subnet_id_1
+  private_subnet_id_2 = module.VPC.private_subnet_id_2
+  backend_security_group_id = module.VPC.backend_security_group_id
+  db_password = var.db_password
+}
+
 module "EC2" {
   source = "./modules/EC2"
   vpc_id = module.VPC.vpc_id
@@ -30,22 +39,19 @@ module "EC2" {
   private_subnet_id_1 = module.VPC.private_subnet_id_1
   private_subnet_id_2 = module.VPC.private_subnet_id_2
   backend_security_group_id = module.VPC.backend_security_group_id
+  rds_endpoint = module.RDS.rds_endpoint
+  public_key = file("./scripts/public_key.txt")
+  db_password = var.db_password
 }
 
-# module "Load" {
-#   source = "./modules/LOAD"
-#   vpc_id = module.VPC.vpc_id
-#   public_subnet_id_1 = module.VPC.public_subnet_id_1
-#   public_subnet_id_2 = module.VPC.public_subnet_id_2
-#   instance_id_1 = module.EC2.instance_id_1
-#   instance_id_2 = module.EC2.instance_id_2
-# }
+module "Load" {
+  source = "./modules/LOAD"
+  vpc_id = module.VPC.vpc_id
+  public_subnet_id_1 = module.VPC.public_subnet_id_1
+  public_subnet_id_2 = module.VPC.public_subnet_id_2
+  instance_id_1 = module.EC2.instance_id_1
+  instance_id_2 = module.EC2.instance_id_2
+}
 
-# module "RDS" {
-#   source = "./modules/RDS"
-#   vpc_id = module.VPC.vpc_id
-#   private_subnet_id = module.VPC.private_subnet_id_1
-#   private_subnet_id_2 = module.VPC.private_subnet_id_2
-#   backend_security_group_id = module.VPC.backend_security_group_id
-# }
+
 

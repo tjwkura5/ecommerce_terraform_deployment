@@ -27,3 +27,17 @@ variable "ami" {
   type = string
   default = "ami-0866a3c8686eaeeba"
 }
+
+variable "public_key" {
+  description = "SSH public key to be added to the authorized_keys"
+  type        = string
+}
+
+variable "rds_endpoint" {
+}
+
+variable "db_password" {
+    description = "password for db user"
+    type = string
+    sensitive = true
+}
