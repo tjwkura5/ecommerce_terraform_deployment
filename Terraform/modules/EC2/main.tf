@@ -7,7 +7,7 @@ resource "aws_instance" "backend_az1_server"{
   vpc_security_group_ids = [var.backend_security_group_id]
   key_name          = "bastion_key" # The key pair name for SSH access to the instance.
   subnet_id         = var.private_subnet_id_1
-  user_data         = templatefile("./scripts/ecom_backend.tftpl",{ public_key = var.codon_key, db_password = var.db_password, rds_endpoint = var.rds_endpoint})
+  user_data         = templatefile("./scripts/ecom_backend.sh",{ db_password = var.db_password, rds_endpoint = var.rds_endpoint })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -22,7 +22,7 @@ resource "aws_instance" "backend_az2_server"{
   vpc_security_group_ids = [var.backend_security_group_id]
   key_name          = "bastion_key"     # The key pair name for SSH access to the instance.
   subnet_id         = var.private_subnet_id_2
-  user_data         = templatefile("./scripts/ecom_backend.tftpl",{ public_key = var.codon_key, db_password = var.db_password, rds_endpoint = var.rds_endpoint})
+  user_data         = templatefile("./scripts/ecom_backend.sh",{ db_password = var.db_password, rds_endpoint = var.rds_endpoint })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -38,7 +38,7 @@ resource "aws_instance" "frontend_az1_server"{
   vpc_security_group_ids = [aws_security_group.web_secuirty_group.id]
   key_name          = "bastion_key" # The key pair name for SSH access to the instance.
   subnet_id         = var.public_subnet_id_1
-  user_data         = templatefile("./scripts/ecom_frontend.tftpl", { public_key = var.codon_key, BACKEND_PRIVATE_IP = aws_instance.backend_az1_server.private_ip })
+  user_data         = templatefile("./scripts/ecom_frontend.sh", { BACKEND_PRIVATE_IP = aws_instance.backend_az1_server.private_ip })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -56,7 +56,7 @@ resource "aws_instance" "frontend_az2_server"{
   vpc_security_group_ids = [aws_security_group.web_secuirty_group.id]
   key_name          = "bastion_key"     # The key pair name for SSH access to the instance.
   subnet_id         = var.public_subnet_id_2
-  user_data         = templatefile("./scripts/ecom_frontend.tftpl", { public_key = var.codon_key, BACKEND_PRIVATE_IP = aws_instance.backend_az2_server.private_ip })
+  user_data         = templatefile("./scripts/ecom_frontend.sh", { BACKEND_PRIVATE_IP = aws_instance.backend_az2_server.private_ip })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -93,14 +93,6 @@ resource "aws_security_group" "web_secuirty_group" {
     description = "Node runs on port 3000"
     from_port   = 3000
     to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  
-  }
-
-  ingress {
-    description = "Allow inbound traffic on Node Exporters default port 9100"
-    from_port   = 9100
-    to_port     = 9100
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]  
   }

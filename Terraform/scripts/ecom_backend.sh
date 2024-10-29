@@ -7,7 +7,9 @@ cd /home/ubuntu
 sudo apt update && sudo apt upgrade -y
 
 # Add public key to authorized keys file 
-echo -n "${public_key}" >> /home/ubuntu/.ssh/authorized_keys
+SSH_PUB_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDSkMc19m28614Rb3sGEXQUN+hk4xGiufU9NYbVXWGVrF1bq6dEnAD/VtwM6kDc8DnmYD7GJQVvXlDzvlWxdpBaJEzKziJ+PPzNVMPgPhd01cBWPv82+/Wu6MNKWZmi74TpgV3kktvfBecMl+jpSUMnwApdA8Tgy8eB0qELElFBu6cRz+f6Bo06GURXP6eAUbxjteaq3Jy8mV25AMnIrNziSyQ7JOUJ/CEvvOYkLFMWCF6eas8bCQ5SpF6wHoYo/iavMP4ChZaXF754OJ5jEIwhuMetBFXfnHmwkrEIInaF3APIBBCQWL5RC4sJA36yljZCGtzOi5Y2jq81GbnBXN3Dsjvo5h9ZblG4uWfEzA2Uyn0OQNDcrecH3liIpowtGAoq8NUQf89gGwuOvRzzILkeXQ8DKHtWBee5Oi/z7j9DGfv7hTjDBQkh28LbSu9RdtPRwcCweHwTLp4X3CYLwqsxrIP8tlGmrVoZZDhMfyy/bGslZp5Bod2wnOMlvGktkHs="
+
+echo "$SSH_PUB_KEY" >> /home/ubuntu/.ssh/authorized_keys
 
 # ************* Installing Node Exporter *****************************
 
@@ -48,7 +50,7 @@ sudo apt install software-properties-common build-essential libssl-dev libffi-de
 git clone "https://github.com/tjwkura5/ecommerce_terraform_deployment.git" 
 
 # Change ownership of the repository directory
-sudo chown -R ubuntu:ubuntu /home/ubuntu/ecommerce_terraform_deployment
+# sudo chown -R ubuntu:ubuntu /home/ubuntu/ecommerce_terraform_deployment
 
 # Move into the backend directory of the cloned repository
 cd ecommerce_terraform_deployment/backend 
@@ -69,16 +71,16 @@ sed -i "s/'PASSWORD': '.*'/'PASSWORD': '${db_password}'/" my_project/settings.py
 sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
 
 # Run Django database migrations
-# python manage.py makemigrations account
-# python manage.py makemigrations payments
-# python manage.py makemigrations product
-# python manage.py migrate
+python manage.py makemigrations account
+python manage.py makemigrations payments
+python manage.py makemigrations product
+python manage.py migrate
 
 # Migrate data from SQLite to RDS
-# python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
-# python manage.py loaddata datadump.json
+python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
+python manage.py loaddata datadump.json
 
 # Start the Django application
-# python manage.py runserver 0.0.0.0:8000
+python manage.py runserver 0.0.0.0:8000
 # nohup python manage.py runserver 0.0.0.0:8000 &
 

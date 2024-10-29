@@ -5,7 +5,3 @@ output "instance_id_1" {
 output "instance_id_2" {
     value = aws_instance.backend_az2_server.id
 }
-
-output "codon_key" {
-    value = var.codon_key
-}

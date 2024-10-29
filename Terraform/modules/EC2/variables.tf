@@ -28,11 +28,6 @@ variable "ami" {
   default = "ami-0866a3c8686eaeeba"
 }
 
-variable "codon_key" {
-  description = "SSH public key to be added to the authorized_keys"
-  type        = string
-}
-
 variable "rds_endpoint" {
 }
 

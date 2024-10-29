@@ -9,12 +9,20 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "tcp"
     cidr_blocks  = ["0.0.0.0/0"]  # Allow HTTP traffic from anywhere
   }
+
+  # Egress (outbound) rule to allow all traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]  # Allow all outbound traffic
+  }
 }
 
 # Create Target Group for the Load Balancer
 resource "aws_lb_target_group" "my_target_group" {
   name     = "my-target-group"
-  port     = 80
+  port     = 3000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 

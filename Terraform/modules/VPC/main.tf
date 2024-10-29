@@ -92,28 +92,13 @@ resource "aws_eip" "nat_eip_1" {
   domain = "vpc"
 }
 
-resource "aws_eip" "nat_eip_2" {
-  domain = "vpc"
-}
-
-# Create NAT Gateway for each public subnet
+# Create NAT Gateway
 resource "aws_nat_gateway" "nat_gateway_1" {
   allocation_id = aws_eip.nat_eip_1.id
   subnet_id     = aws_subnet.public_subnet_1.id
   
   tags = {
     Name = "nat-gateway_1"
-  }
-
-  depends_on = [aws_internet_gateway.my_igw]
-}
-
-resource "aws_nat_gateway" "nat_gateway_2" {
-  allocation_id = aws_eip.nat_eip_2.id
-  subnet_id     = aws_subnet.public_subnet_2.id
-
-  tags = {
-    Name = "nat-gateway_2"
   }
 
   depends_on = [aws_internet_gateway.my_igw]
@@ -138,22 +123,9 @@ resource "aws_route_table_association" "private_rt_assoc_1" {
   route_table_id = aws_route_table.private_route_table_1.id
 }
 
-resource "aws_route_table" "private_route_table_2" {
-  vpc_id = aws_vpc.wl5vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    gateway_id     = aws_nat_gateway.nat_gateway_2.id
-  }
-
-  tags = {
-    Name = "private-route-table_2"
-  }
-}
-
 resource "aws_route_table_association" "private_rt_assoc_2" {
   subnet_id      = aws_subnet.private_subnet_2.id
-  route_table_id = aws_route_table.private_route_table_2.id
+  route_table_id = aws_route_table.private_route_table_1.id
 }
 
 # Create a VPC Peering Connection between the default VPC and the Terraform-created VPC
@@ -179,14 +151,7 @@ resource "aws_route" "public_to_default" {
 
 # Define the routes for the first private route table
 resource "aws_route" "private_1_to_default" {
-  route_table_id         = aws_route_table.private_route_table_1.id  # Replace with private route table ID for private subnet 1
-  destination_cidr_block = data.aws_vpc.default_vpc.cidr_block
-  vpc_peering_connection_id = aws_vpc_peering_connection.vpc_peering.id
-}
-
-# Define the routes for the second private route table
-resource "aws_route" "private_2_to_default" {
-  route_table_id         = aws_route_table.private_route_table_2.id 
+  route_table_id         = aws_route_table.private_route_table_1.id 
   destination_cidr_block = data.aws_vpc.default_vpc.cidr_block
   vpc_peering_connection_id = aws_vpc_peering_connection.vpc_peering.id
 }

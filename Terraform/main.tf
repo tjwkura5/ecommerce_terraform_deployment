@@ -29,6 +29,7 @@ module "RDS" {
   private_subnet_id_2 = module.VPC.private_subnet_id_2
   backend_security_group_id = module.VPC.backend_security_group_id
   db_password = var.db_password
+  depends_on = [module.VPC]
 }
 
 module "EC2" {
@@ -40,8 +41,8 @@ module "EC2" {
   private_subnet_id_2 = module.VPC.private_subnet_id_2
   backend_security_group_id = module.VPC.backend_security_group_id
   rds_endpoint = module.RDS.rds_endpoint
-  codon_key = file("./scripts/public_key.txt")
   db_password = var.db_password
+  depends_on = [module.RDS]
 }
 
 module "Load" {
@@ -51,11 +52,7 @@ module "Load" {
   public_subnet_id_2 = module.VPC.public_subnet_id_2
   instance_id_1 = module.EC2.instance_id_1
   instance_id_2 = module.EC2.instance_id_2
-}
-
-output "codon_key" {
-  value     = module.EC2.codon_key
-  sensitive = false
+  depends_on = [module.EC2]
 }
 
 
