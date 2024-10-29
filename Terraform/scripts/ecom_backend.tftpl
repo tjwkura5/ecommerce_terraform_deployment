@@ -1,32 +1,27 @@
 #!/bin/bash
 
-# Update and upgrade system packages
+# Change directory
+cd /home/ubuntu
+
+# Update and upgrade system packages as root
 sudo apt update && sudo apt upgrade -y
 
-#Add public key to authorized keys files 
-echo "${public_key}" >> ~/.ssh/authorized_keys
+# Add public key to authorized keys file 
+echo -n "${public_key}" >> /home/ubuntu/.ssh/authorized_keys
 
-#*************Installing Node Exporter*****************************
+# ************* Installing Node Exporter *****************************
 
-# Update the package list
+# Install necessary packages as root
 sudo apt-get update -y
-
-# Install necessary packages
 sudo apt-get install -y wget
 
-# Download Node Exporter
+# Download and install Node Exporter as root
 wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz
-
-# Extract the downloaded tarball
 tar xvfz node_exporter-1.6.0.linux-amd64.tar.gz
-
-# Move the Node Exporter binary to a directory in your PATH
 sudo mv node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
-
-# Clean up
 rm -rf node_exporter-1.6.0.linux-amd64*
 
-# Create a service file for Node Exporter
+# Create a systemd service for Node Exporter to run as 'ubuntu'
 cat <<EOL | sudo tee /etc/systemd/system/node_exporter.service
 [Unit]
 Description=Node Exporter
@@ -39,73 +34,51 @@ ExecStart=/usr/local/bin/node_exporter
 WantedBy=multi-user.target
 EOL
 
-# Start and enable Node Exporter
+# Start and enable Node Exporter as root
 sudo systemctl daemon-reload
 sudo systemctl start node_exporter
 sudo systemctl enable node_exporter
 
-# ****************************************** Cloning Repo and running App *******************
-
-# Add the deadsnakes PPA to get more Python versions
+# Install additional repositories and Python packages
 sudo add-apt-repository ppa:deadsnakes/ppa -y
-
-# Install Python 3.9 and venv
 sudo apt install python3.9 python3.9-venv python3.9-dev -y
+sudo apt install software-properties-common build-essential libssl-dev libffi-dev git -y
 
-# Install software-properties-common (useful for managing PPAs)
-# The suggestion to install the software-properties-common package came from a fellow student
-# provides tools to manage software repositories
-sudo apt install software-properties-common -y
+# Clone the repository
+git clone "https://github.com/tjwkura5/ecommerce_terraform_deployment.git" 
 
-# Install additional development tools (in case they're needed for Python packages)
-sudo apt install build-essential libssl-dev libffi-dev -y
+# Change ownership of the repository directory
+sudo chown -R ubuntu:ubuntu /home/ubuntu/ecommerce_terraform_deployment
 
-# Install Git for version control
-sudo apt install git -y
+# Move into the backend directory of the cloned repository
+cd ecommerce_terraform_deployment/backend 
 
-# git clone succeeds (returns an exit code of 0), the part after || is skipped.
-# git clone fails (returns a non-zero exit code), the block { echo "Git clone failed!"; exit 1; } is executed.
-# The Or echo git clone failed exit 1 was a suggestion from chat gpt and has been used throughout
-git clone "https://github.com/tjwkura5/ecommerce_terraform_deployment.git" || { echo "Git clone failed!"; exit 1; }
-
-# Extract the name of the repository from the URL and move into the repository directory
-# The basename command extracts the last part of a file path or URL.
-# The -s option allows you to strip a suffix in this case .git ( got this from chatgpt I already knew about basename)
-
-cd "ecommerce_terraform_deployment/backend" || { echo "Failed to enter repo directory!"; exit 1; }
-
-# Create a Python virtual environment in the root of the cloned repository..."
-python3.9 -m venv venv 
-
-# Activate the virtual environment
+# Create and activate a Python virtual environment
+python3.9 -m venv venv
 source venv/bin/activate
 
-# Upgrade pip in the virtual environment
-pip install --upgrade pip 
-
-# Install dependencies from a requirements.txt 
+# Upgrade pip and install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Replace Allowed host
+# Replace the ALLOWED_HOSTS with the private IP address in the Django settings
 sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\"$(hostname -I | awk '{print $1}')\"]/g" my_project/settings.py
 
-# Replace PASSWORD
+# Update Django settings with database password and RDS endpoint
 sed -i "s/'PASSWORD': '.*'/'PASSWORD': '${db_password}'/" my_project/settings.py
-
-# Replace HOST
 sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
 
-#Create the tables in RDS: 
-python manage.py makemigrations account
-python manage.py makemigrations payments
-python manage.py makemigrations product
-python manage.py migrate
+# Run Django database migrations
+# python manage.py makemigrations account
+# python manage.py makemigrations payments
+# python manage.py makemigrations product
+# python manage.py migrate
 
-#Migrate the data from SQLite file to RDS:
-python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
+# Migrate data from SQLite to RDS
+# python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
+# python manage.py loaddata datadump.json
 
-python manage.py loaddata datadump.json
-
-#Run the application
-python manage.py runserver 0.0.0.0:8000
+# Start the Django application
+# python manage.py runserver 0.0.0.0:8000
+# nohup python manage.py runserver 0.0.0.0:8000 &
 

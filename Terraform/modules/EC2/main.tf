@@ -1,13 +1,3 @@
-# RSA key of size 4096 bits
-resource "tls_private_key" "my_key_pair" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_key_pair" "bastion_key_pair" {
-  key_name   = "bastion-key-pair"
-  public_key = tls_private_key.my_key_pair.public_key_openssh
-}
 
 # Create backend EC2 instances in AWS. 
 resource "aws_instance" "backend_az1_server"{
@@ -15,9 +5,9 @@ resource "aws_instance" "backend_az1_server"{
   instance_type     = var.instance_type
   # Attach an existing security group to the instance.
   vpc_security_group_ids = [var.backend_security_group_id]
-  key_name          = aws_key_pair.bastion_key_pair.key_name # The key pair name for SSH access to the instance.
+  key_name          = "bastion_key" # The key pair name for SSH access to the instance.
   subnet_id         = var.private_subnet_id_1
-  user_data         = templatefile("./scripts/ecom_backend.tftpl",{ public_key = var.public_key, db_password = var.db_password, rds_endpoint = var.rds_endpoint})
+  user_data         = templatefile("./scripts/ecom_backend.tftpl",{ public_key = var.codon_key, db_password = var.db_password, rds_endpoint = var.rds_endpoint})
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -30,9 +20,9 @@ resource "aws_instance" "backend_az2_server"{
   instance_type     = var.instance_type
   # Attach an existing security group to the instance.
   vpc_security_group_ids = [var.backend_security_group_id]
-  key_name          = aws_key_pair.bastion_key_pair.key_name # The key pair name for SSH access to the instance.
+  key_name          = "bastion_key"     # The key pair name for SSH access to the instance.
   subnet_id         = var.private_subnet_id_2
-  user_data         = templatefile("./scripts/ecom_backend.tftpl",{ public_key = var.public_key, db_password = var.db_password, rds_endpoint = var.rds_endpoint})
+  user_data         = templatefile("./scripts/ecom_backend.tftpl",{ public_key = var.codon_key, db_password = var.db_password, rds_endpoint = var.rds_endpoint})
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -46,9 +36,9 @@ resource "aws_instance" "frontend_az1_server"{
   instance_type     = var.instance_type
   # Attach an existing security group to the instance.
   vpc_security_group_ids = [aws_security_group.web_secuirty_group.id]
-  key_name          = aws_key_pair.bastion_key_pair.key_name # The key pair name for SSH access to the instance.
+  key_name          = "bastion_key" # The key pair name for SSH access to the instance.
   subnet_id         = var.public_subnet_id_1
-  user_data         = templatefile("./scripts/ecom_frontend.tftpl", { public_key = var.public_key, BACKEND_PRIVATE_IP = aws_instance.backend_az1_server.private_ip })
+  user_data         = templatefile("./scripts/ecom_frontend.tftpl", { public_key = var.codon_key, BACKEND_PRIVATE_IP = aws_instance.backend_az1_server.private_ip })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -64,9 +54,9 @@ resource "aws_instance" "frontend_az2_server"{
   instance_type     = var.instance_type
   # Attach an existing security group to the instance.
   vpc_security_group_ids = [aws_security_group.web_secuirty_group.id]
-  key_name          = aws_key_pair.bastion_key_pair.key_name # The key pair name for SSH access to the instance.
+  key_name          = "bastion_key"     # The key pair name for SSH access to the instance.
   subnet_id         = var.public_subnet_id_2
-  user_data         = templatefile("./scripts/ecom_frontend.tftpl", { public_key = var.public_key, BACKEND_PRIVATE_IP = aws_instance.backend_az2_server.private_ip })
+  user_data         = templatefile("./scripts/ecom_frontend.tftpl", { public_key = var.codon_key, BACKEND_PRIVATE_IP = aws_instance.backend_az2_server.private_ip })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {
@@ -128,5 +118,6 @@ resource "aws_security_group" "web_secuirty_group" {
     Terraform : "true"
   }
 }
+
 
 

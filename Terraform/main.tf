@@ -40,7 +40,7 @@ module "EC2" {
   private_subnet_id_2 = module.VPC.private_subnet_id_2
   backend_security_group_id = module.VPC.backend_security_group_id
   rds_endpoint = module.RDS.rds_endpoint
-  public_key = file("./scripts/public_key.txt")
+  codon_key = file("./scripts/public_key.txt")
   db_password = var.db_password
 }
 
@@ -53,5 +53,9 @@ module "Load" {
   instance_id_2 = module.EC2.instance_id_2
 }
 
+output "codon_key" {
+  value     = module.EC2.codon_key
+  sensitive = false
+}
 
 

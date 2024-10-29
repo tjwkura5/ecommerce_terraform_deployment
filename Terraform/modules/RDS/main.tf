@@ -53,7 +53,7 @@ resource "aws_security_group" "rds_sg" {
 }
 
 output "rds_endpoint" {
-  value = aws_db_instance.postgres_db.endpoint
+  value = aws_db_instance.postgres_db.address
 }
 
 output "db_password" {

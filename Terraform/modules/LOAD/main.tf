@@ -58,11 +58,12 @@ resource "aws_lb_listener" "http_listener" {
 resource "aws_lb_target_group_attachment" "instance1" {
   target_group_arn = aws_lb_target_group.my_target_group.arn
   target_id        = var.instance_id_1
-  port             = 80
+  port             = 3000
 }
 
 resource "aws_lb_target_group_attachment" "instance2" {
   target_group_arn = aws_lb_target_group.my_target_group.arn
   target_id        = var.instance_id_2
-  port             = 80
+  port             = 3000
 }
+
