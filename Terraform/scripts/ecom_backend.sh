@@ -71,16 +71,16 @@ sed -i "s/'PASSWORD': '.*'/'PASSWORD': '${db_password}'/" my_project/settings.py
 sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
 
 # Run Django database migrations
-python manage.py makemigrations account
-python manage.py makemigrations payments
-python manage.py makemigrations product
-python manage.py migrate
+# python manage.py makemigrations account
+# python manage.py makemigrations payments
+# python manage.py makemigrations product
+# python manage.py migrate
 
 # Migrate data from SQLite to RDS
-python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
-python manage.py loaddata datadump.json
+# python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
+# python manage.py loaddata datadump.json
 
 # Start the Django application
-python manage.py runserver 0.0.0.0:8000
+# python manage.py runserver 0.0.0.0:8000
 # nohup python manage.py runserver 0.0.0.0:8000 &
 
