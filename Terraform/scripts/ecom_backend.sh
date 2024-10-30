@@ -49,31 +49,44 @@ sudo apt install python3.9 python3.9-venv python3.9-dev python3-pip -y
 sudo apt install software-properties-common -y
 
 # Clone the repository
-git clone "https://github.com/tjwkura5/ecommerce_terraform_deployment.git" 
+git clone https://github.com/tjwkura5/ecommerce_terraform_deployment.git /home/ubuntu/ecommerce_terraform_deployment
 
 # Change ownership of the repository directory
 # sudo chown -R ubuntu:ubuntu /home/ubuntu/ecommerce_terraform_deployment
 
-# Move into the backend directory of the cloned repository
-cd ecommerce_terraform_deployment/backend 
+# Installing Python and Python-related software for the application
+echo "Updating current installed packages..."
+sudo apt update
 
-# Create and activate a Python virtual environment
+echo "Installing software properties for managing PPAs..."
+sudo apt install -y software-properties-common
+
+echo "Adding Deadsnakes PPA repository for Python..."
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+
+echo "Installing Python resources..."
+sudo apt install -y python3.9 python3.9-venv python3-pip
+
+echo "Creating Python Virtual Environment..."
+cd /home/ubuntu/ecommerce_terraform_deployment
 python3.9 -m venv venv
 source venv/bin/activate
 
-# Upgrade pip and install dependencies
+# Building Application
+echo "Upgrading PIP..."
 pip install --upgrade pip
-pip install -r requirements.txt
 
-# Replace the ALLOWED_HOSTS with the private IP address in the Django settings
-sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\"$(hostname -I | awk '{print $1}')\"]/g" my_project/settings.py
+echo "Installing all necessary application dependencies..."
+pip install -r /home/ubuntu/ecommerce_terraform_deployment/backend/requirements.txt
+
+backend_private_ip=$(hostname -i | awk '{print $1}')
+
+# Configuring Allowed Hosts in settings.py
+sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = \['$backend_private_ip'\]/" /home/ubuntu/ecommerce_terraform_deployment/backend/my_project/settings.py || { echo "Backend Private IP failed to update."; exit 1; }
 
 # Update Django settings with database password and RDS endpoint
-sed -i "s/'PASSWORD': '.*'/'PASSWORD': '${db_password}'/" my_project/settings.py
-sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
-
+sed -i "s/'PASSWORD': '.*'/'PASSWORD': '${db_password}'/" /home/ubuntu/ecommerce_terraform_deployment/backend/my_project/settings.py
+sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" /home/ubuntu/ecommerce_terraform_deployment/backend/my_project/settings.py
 
 # Start the Django application
 python manage.py runserver 0.0.0.0:8000
-# nohup python manage.py runserver 0.0.0.0:8000 &
-
