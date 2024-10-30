@@ -7,7 +7,7 @@ resource "aws_instance" "backend_az1_server"{
   vpc_security_group_ids = [var.backend_security_group_id]
   key_name          = "bastion_key" # The key pair name for SSH access to the instance.
   subnet_id         = var.private_subnet_id_1
-  user_data         = templatefile("./scripts/ecom_backend.sh",{ db_password = var.db_password, rds_endpoint = var.rds_endpoint })
+  user_data         = templatefile("./scripts/ecom_backend_migrations.sh",{ db_password = var.db_password, rds_endpoint = var.rds_endpoint })
   
   # Tagging the resource with a Name label. Tags help in identifying and organizing resources in AWS.
   tags = {

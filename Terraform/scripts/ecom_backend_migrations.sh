@@ -42,11 +42,11 @@ sudo systemctl start node_exporter
 sudo systemctl enable node_exporter
 
 # Install additional repositories and Python packages
+sudo apt install software-properties-common -y
+
 sudo add-apt-repository ppa:deadsnakes/ppa -y
 
 sudo apt install python3.9 python3.9-venv python3.9-dev python3-pip -y
-
-sudo apt install software-properties-common -y
 
 # Clone the repository
 git clone "https://github.com/tjwkura5/ecommerce_terraform_deployment.git" 
@@ -72,6 +72,21 @@ sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = [\"$(hostname -I | awk '{print $1
 sed -i "s/'PASSWORD': '.*'/'PASSWORD': '${db_password}'/" my_project/settings.py
 sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
 
+# Run Django database migrations
+python manage.py makemigrations account
+python manage.py makemigrations payments
+python manage.py makemigrations product
+# python manage.py migrate auth --database=sqlite
+# python manage.py migrate --database=sqlite
+# python manage.py migrate payments --database=sqlite
+# python manage.py showmigrations --database=sqlite
+# python manage.py dumpdata --database=sqlite > datadump.json
+
+python manage.py migrate
+
+# Migrate data from SQLite to RDS
+python manage.py dumpdata --database=sqlite --natural-foreign --natural-primary -e contenttypes -e auth.Permission --indent 4 > datadump.json
+python manage.py loaddata datadump.json
 
 # Start the Django application
 python manage.py runserver 0.0.0.0:8000
