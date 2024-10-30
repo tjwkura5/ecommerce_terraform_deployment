@@ -49,7 +49,7 @@ sudo apt install python3.9 python3.9-venv python3.9-dev python3-pip -y
 sudo apt install software-properties-common -y
 
 # Clone the repository
-git clone https://github.com/tjwkura5/ecommerce_terraform_deployment.git /home/ubuntu/ecommerce_terraform_deployment
+git clone https://github.com/tjwkura5/ecommerce_terraform_deployment.git 
 
 # Change ownership of the repository directory
 # sudo chown -R ubuntu:ubuntu /home/ubuntu/ecommerce_terraform_deployment
@@ -68,7 +68,7 @@ echo "Installing Python resources..."
 sudo apt install -y python3.9 python3.9-venv python3-pip
 
 echo "Creating Python Virtual Environment..."
-cd /home/ubuntu/ecommerce_terraform_deployment
+cd /home/ubuntu/ecommerce_terraform_deployment/backend
 python3.9 -m venv venv
 source venv/bin/activate
 
