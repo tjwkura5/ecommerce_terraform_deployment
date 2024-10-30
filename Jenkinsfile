@@ -17,12 +17,12 @@ pipeline {
       steps {
         dir('backend') {  // Change to the 'backend' directory
           sh '''#!/bin/bash
-          // source venv/bin/activate
-          // export PYTHONPATH=$(pwd)
-          // pip install pytest-django
-          // python manage.py makemigrations
-          // python manage.py migrate
-          // pytest account/tests.py --verbose --junit-xml test-reports/results.xml
+          source venv/bin/activate
+          export PYTHONPATH=$(pwd)
+          pip install pytest-django
+          python manage.py makemigrations
+          python manage.py migrate
+          pytest account/tests.py --verbose --junit-xml test-reports/results.xml
           ''' 
         }
       }
