@@ -74,6 +74,12 @@ sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
 # python manage.py makemigrations account
 # python manage.py makemigrations payments
 # python manage.py makemigrations product
+# python manage.py migrate auth --database=sqlite
+# python manage.py migrate --database=sqlite
+# python manage.py migrate payments --database=sqlite
+# python manage.py showmigrations --database=sqlite
+# python manage.py dumpdata --database=sqlite > datadump.json
+
 # python manage.py migrate
 
 # Migrate data from SQLite to RDS
@@ -84,3 +90,4 @@ sed -i "s/'HOST': '.*'/'HOST': '${rds_endpoint}'/" my_project/settings.py
 # python manage.py runserver 0.0.0.0:8000
 # nohup python manage.py runserver 0.0.0.0:8000 &
 
+# python manage.py dumpdata --database=sqlite -e contenttypes -e auth.Permission --indent 4 > datadump.json
