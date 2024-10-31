@@ -333,7 +333,7 @@ In my ecom_frontend.sh I am doing the following:
 
 12. Create a monitoring EC2 called "Monitoring" in the default VPC that will monitor the resources of the various servers. Install Prometheus and grafana on this server.
 
-13. Update your Prometheus configuration (/opt/prometheus/prometheus.yml) to include the EC2 instance where Node Exporter is running.
+13. Update your Prometheus configuration (/opt/prometheus/prometheus.yml) to include the EC2 instances where Node Exporter is running.
 
 14. Restart Prometheus to apply the changes:
 
@@ -344,13 +344,13 @@ In my ecom_frontend.sh I am doing the following:
 
 ## Issues/Troubleshooting
 
-This workload was a MONSTER. I only got everything working at the last second, and it felt like I was running into issue after issue after issue. To avoid boring you, I will highlight the major problems I faced, as well as some issues I managed to avoid thanks to warnings from a fellow classmate.
+This workload was a MONSTER. I only got everything working at the last second, and it felt like I was running into issue after issue after issue. To avoid boring you, I will highlight the major problems I faced, as well as some issues I managed to avoid thanks to warnings from fellow classmates.
 
 **Installing Node and NPM**
 
 When trying to install Node on my frontend servers, I kept running into an issue where Node would get installed, but NPM was not. The funny thing was that it wasn't working in my user data script, but when I SSH'd into my instance after it was created, I was able to install everything just fine. I tried everything, and no one else seemed to have the same issue as me. I attempted to use an alternate method to install Node/NPM, tried installing NPM separately, added a line to reinstall NPM, and included a check to see if npm was available in the current path with logic to add npm to the PATH variable if it wasn't. I ultimately solved the issue during office hours with my instructors. It turns out the installation was taking a long time, and all I needed was a 60-second sleep. From there, everything worked fine.
 
-**Running the Test***
+**Running the Test**
 
 The test stage of my Jenkins pipeline was failing because it was attempting to run tests against a database that didn't exist yet. I didn't want to comment out the default database section of my settings.py, and I didn't want to provision my RDS instance prematurely. The solution was simple: I created a separate settings.py for my tests, keeping everything the same except for changing the default database to the SQLite database. In my pytest.ini, I set the DJANGO_SETTINGS_MODULE to my_project.settings_test. 
 
