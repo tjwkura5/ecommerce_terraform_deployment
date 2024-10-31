@@ -11,6 +11,19 @@ pipeline {
           pip install -r requirements.txt
           '''
         }
+
+        dir('frontend') {  // Change to the 'frontend' directory
+          sh '''#!/bin/bash
+           if ! command -v node &> /dev/null; then
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+           fi
+
+          export NODE_OPTIONS=--openssl-legacy-provider
+          export CI=false
+          npm ci
+          '''
+        }
       }
     }
     stage('Test') {
