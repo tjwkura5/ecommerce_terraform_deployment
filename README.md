@@ -689,7 +689,7 @@ The selection of the subnet for the RDS instance is based on the availability an
 
 **OWASP SCAN** - In our previous workload we are performing An OWASP Dependency-Check to proactively scan for vulnerabilities in the application’s dependencies. In this workload we didn't inlcude this stage in our pipeline. I did some digging and I saw that OWASP tools like ZAP (Zed Attack Proxy) can scan Django apps to identify vulnerabilities such as SQL injection, cross-site scripting (XSS), and improper authentication handling.
 
-**Testing Our Frontend** - We included a stage for running tests for our backend services but we don't have any unit test for our frontend application. We should incorporate unit test to catch bugs eary and ensure the components our behaving as expected in our react app. 
+**Testing Our Frontend** - We included a stage for running tests for our backend services but we don't have any unit test for our frontend application. We should incorporate unit test to catch bugs eary and ensure the components are behaving as expected in our react app. 
 
 **Adding Tear Down** - If we want to be able to run our CI/CD pipeline repeatedly, we should add a teardown stage to destroy and rebuild our infrastructure. This will make our process more flexible and reliable by ensuring that every deployment is from a clean slate, reducing the chance of configuration drift and persistent errors. It also allows us to validate our Infrastructure as Code (IaC) fully, confirming that the environment can be consistently recreated with each run.
 
